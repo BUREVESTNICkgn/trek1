@@ -1,0 +1,146 @@
+<section class="page">
+  <header class="hero">
+    <div class="hero__text">
+      <mat-chip-set aria-label="tags">
+        <mat-chip color="primary">Work habits</mat-chip>
+        <mat-chip>Focus</mat-chip>
+        <mat-chip>Well-being</mat-chip>
+      </mat-chip-set>
+      <h1>Трекер полезных действий</h1>
+      <p class="lede">
+        Добавляйте новые привычки, отмечайте выполнение, отслеживайте прогресс и держите рабочие цели
+        в одном месте.
+      </p>
+      <div class="hero__actions">
+        <button mat-stroked-button color="primary" type="button" (click)="resetCompletion()">
+          <mat-icon>refresh</mat-icon>
+          Сбросить отметки дня
+        </button>
+      </div>
+    </div>
+
+    <mat-card class="hero__stats" *ngIf="habits().length; else noHabits">
+      <mat-card-header>
+        <div class="metric">
+          <p class="label">Всего привычек</p>
+          <p class="value">{{ habits().length }}</p>
+        </div>
+        <div class="metric">
+          <p class="label">Отмечено сегодня</p>
+          <p class="value highlight">{{ completedToday() }}</p>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="progress__label">Прогресс дня</p>
+        <mat-progress-bar [value]="progress()"></mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+    <ng-template #noHabits>
+      <mat-card class="hero__stats empty">Добавьте первую привычку, чтобы начать.</mat-card>
+    </ng-template>
+  </header>
+
+  <section class="controls">
+    <mat-form-field appearance="outline">
+      <mat-label>Поиск по списку</mat-label>
+      <input matInput type="search" placeholder="Например: уборка" [formControl]="searchControl" />
+      <mat-hint>Фильтр по названию или описанию</mat-hint>
+    </mat-form-field>
+  </section>
+
+  <div class="layout">
+    <mat-card class="form-panel">
+      <mat-card-header>
+        <div>
+          <p class="eyebrow">Форма</p>
+          <h2>{{ formTitle }}</h2>
+          <p>Реактивная форма для добавления или обновления привычки.</p>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="addHabitForm" (ngSubmit)="submit()" class="form">
+          <mat-form-field appearance="fill">
+            <mat-label>Название</mat-label>
+            <input matInput formControlName="title" type="text" placeholder="Например: Ответить на письма" />
+            <mat-hint *ngIf="addHabitForm.controls.title.invalid && addHabitForm.controls.title.touched">
+              Укажите название привычки (до 80 символов).
+            </mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Описание</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              rows="3"
+              placeholder="Коротко опишите привычку"
+            ></textarea>
+            <mat-hint *ngIf="addHabitForm.controls.description.invalid && addHabitForm.controls.description.touched">
+              Добавьте описание (до 220 символов).
+            </mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Частота</mat-label>
+            <input matInput formControlName="frequency" type="text" placeholder="Например: Каждый день" />
+            <mat-hint *ngIf="addHabitForm.controls.frequency.invalid && addHabitForm.controls.frequency.touched">
+              Заполните частоту.
+            </mat-hint>
+          </mat-form-field>
+
+          <div class="form__actions">
+            <button mat-raised-button color="primary" type="submit">{{ submitLabel }}</button>
+            <button mat-stroked-button type="button" *ngIf="isEditing()" (click)="cancelEdit()">Отмена</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="list-panel">
+      <mat-card-header>
+        <div>
+          <p class="eyebrow">Список привычек</p>
+          <h2>Рабочие привычки</h2>
+          <p>Отмечайте выполнение, редактируйте и удаляйте карточки.</p>
+        </div>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        <div *ngIf="filteredHabits().length; else emptyList" class="habit-grid">
+          <article class="habit-card" *ngFor="let habit of filteredHabits()">
+            <header class="habit-card__header">
+              <div class="habit-card__title">
+                <mat-chip-set>
+                  <mat-chip>{{ habit.frequency }}</mat-chip>
+                </mat-chip-set>
+                <h3>{{ habit.title }}</h3>
+              </div>
+              <mat-checkbox [checked]="habit.completedToday" (change)="toggleHabit(habit)">
+                {{ habit.completedToday ? 'Сделано' : 'В процессе' }}
+              </mat-checkbox>
+            </header>
+            <p class="description">{{ habit.description }}</p>
+            <footer class="habit-card__footer">
+              <div class="meta">Создано {{ habit.createdAt | date: 'dd.MM.yyyy' }}</div>
+              <div class="actions">
+                <button mat-stroked-button type="button" (click)="startEdit(habit)">
+                  <mat-icon>edit</mat-icon>
+                  Редактировать
+                </button>
+                <button mat-flat-button color="warn" type="button" (click)="deleteHabit(habit)">
+                  <mat-icon>delete</mat-icon>
+                  Удалить
+                </button>
+              </div>
+            </footer>
+          </article>
+        </div>
+        <ng-template #emptyList>
+          <div class="empty">
+            <p>Нет привычек по вашему запросу. Добавьте новую или очистите поиск.</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
