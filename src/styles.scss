@@ -1,0 +1,49 @@
+@use '@angular/material' as mat;
+
+/* Angular Material theme */
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$rose-palette
+  ),
+  typography: (
+    brand-family: 'Roboto, system-ui, -apple-system, Segoe UI, sans-serif',
+    plain-family: 'Roboto, system-ui, -apple-system, Segoe UI, sans-serif'
+  ),
+  density: (
+  scale: 0
+)
+));
+
+@include mat.core();
+@include mat.all-component-themes($theme);
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #d4d6dd;
+  color: #1c2058;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #0b1220;
+}

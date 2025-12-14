@@ -1,0 +1,91 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero {
+  overflow: hidden;
+}
+
+.hero-content {
+  display: grid;
+  gap: 12px;
+}
+
+.stats {
+  display: grid;
+  gap: 12px;
+}
+
+.progress {
+  padding-top: 4px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.panel {
+  border-radius: 16px;
+}
+
+.full {
+  width: 100%;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.habit {
+  border-radius: 16px;
+}
+
+.habit-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.desc {
+  margin: 0 0 8px;
+}
+
+.meta {
+  margin: 0;
+  opacity: 0.75;
+  font-size: 12px;
+}
+
+.empty-note {
+  padding: 12px 0;
+  opacity: 0.75;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
