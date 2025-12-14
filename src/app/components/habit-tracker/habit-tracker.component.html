@@ -47,7 +47,7 @@
           <mat-form-field appearance="outline" class="full">
             <mat-label>Название</mat-label>
             <input matInput formControlName="title" placeholder="Например: Ответить на письма" />
-            <mat-hint align="end">{{ addHabitForm.controls.title.value?.length || 0 }}/80</mat-hint>
+            <mat-hint align="end">{{ addHabitForm.controls.title.value.length || 0 }}/80</mat-hint>
             <mat-error *ngIf="addHabitForm.controls.title.invalid && addHabitForm.controls.title.touched">
               Укажите название привычки (до 80 символов).
             </mat-error>
@@ -56,7 +56,7 @@
           <mat-form-field appearance="outline" class="full">
             <mat-label>Описание</mat-label>
             <textarea matInput formControlName="description" rows="3" placeholder="Коротко опишите привычку"></textarea>
-            <mat-hint align="end">{{ addHabitForm.controls.description.value?.length || 0 }}/220</mat-hint>
+            <mat-hint align="end">{{ addHabitForm.controls.description.value.length || 0 }}/220</mat-hint>
             <mat-error *ngIf="addHabitForm.controls.description.invalid && addHabitForm.controls.description.touched">
               Добавьте описание (до 220 символов).
             </mat-error>

@@ -1,10 +1,25 @@
 <mat-toolbar color="primary" class="app-toolbar">
-  <button mat-icon-button aria-label="Home">
-    <mat-icon>checklist</mat-icon>
-  </button>
-  <span class="app-title">{{ title() }}</span>
+  <a mat-button routerLink="/" class="brand">
+    <mat-icon>computer</mat-icon>
+    <span>{{ brand() }}</span>
+  </a>
+  <a mat-button routerLink="/catalog">Каталог</a>
+  <a mat-button routerLink="/cart">Корзина</a>
+  <a mat-button routerLink="/admin">Админ</a>
   <span class="spacer"></span>
-  <a mat-button href="https://angular.dev" target="_blank" rel="noopener">Angular</a>
+  <a mat-icon-button routerLink="/cart" [matBadge]="cartSize()" matBadgeColor="accent" aria-label="Корзина">
+    <mat-icon>shopping_cart</mat-icon>
+  </a>
+  <ng-container *ngIf="isAuthenticated; else guest">
+    <button mat-button [matMenuTriggerFor]="userMenu">Аккаунт</button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item routerLink="/admin" *ngIf="isAdmin">Админ-панель</button>
+      <button mat-menu-item (click)="logout()">Выйти</button>
+    </mat-menu>
+  </ng-container>
+  <ng-template #guest>
+    <a mat-stroked-button color="accent" routerLink="/auth">Войти</a>
+  </ng-template>
 </mat-toolbar>
 
 <main class="app-container">

@@ -1,0 +1,26 @@
+.cart-summary {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cart-summary .label {
+  margin: 0;
+  color: #546e7a;
+}
+
+.cart-summary .total {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.qty {
+  width: 120px;
+}
+
+.empty {
+  color: #546e7a;
+}

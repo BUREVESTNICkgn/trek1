@@ -1,0 +1,11 @@
+.form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 12px;
+}
+
+.error {
+  color: #d32f2f;
+  margin-top: 12px;
+}

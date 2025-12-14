@@ -1,0 +1,24 @@
+.form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.summary {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.total {
+  font-weight: 700;
+}
+
+.confirmation {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #2e7d32;
+}
