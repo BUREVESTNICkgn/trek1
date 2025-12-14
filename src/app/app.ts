@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +23,7 @@ import { CartService } from './services/cart.service';
     CommonModule,
     RouterOutlet,
     RouterLink,
+    HttpClientModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,

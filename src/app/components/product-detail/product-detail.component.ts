@@ -40,9 +40,7 @@ export class ProductDetailComponent {
   private readonly fb = inject(FormBuilder);
   private readonly messages = inject(MessageService);
 
-  readonly product: Product | undefined = this.productService.getById(
-    Number(this.route.snapshot.paramMap.get('id'))
-  );
+  readonly product = signal<Product | null>(null);
 
   readonly messageForm = this.fb.nonNullable.group({
     text: ['', Validators.required]
@@ -50,9 +48,16 @@ export class ProductDetailComponent {
 
   readonly deliveryChoice = signal<'pickup' | 'delivery'>('pickup');
 
+  constructor() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.productService.loadById(id).then((product) => this.product.set(product ?? null));
+    this.messages.load();
+  }
+
   get isOwner(): boolean {
     const current = this.auth.currentUser();
-    return !!current && !!this.product && this.product.ownerId === current.id;
+    const product = this.product();
+    return !!current && !!product && product.ownerId === current.id;
   }
 
   get canModerate(): boolean {
@@ -64,25 +69,28 @@ export class ProductDetailComponent {
   }
 
   addToCart(): void {
-    if (this.product && this.canAddToCart) {
-      this.cart.add(this.product);
+    const product = this.product();
+    if (product && this.canAddToCart) {
+      this.cart.add(product);
     }
   }
 
   toggleVisibility(): void {
-    if (this.product && this.canModerate) {
-      this.productService.toggleHidden(this.product.id, !this.product.hidden);
+    const product = this.product();
+    if (product && this.canModerate) {
+      this.productService.toggleHidden(product.id, !product.hidden);
     }
   }
 
   sendMessage(): void {
-    if (this.messageForm.invalid || !this.product) return;
+    const product = this.product();
+    if (this.messageForm.invalid || !product) return;
     const current = this.auth.currentUser();
-    const receiverId = this.product.ownerId;
+    const receiverId = product.ownerId;
     this.messages.send({
       fromUserId: current?.id ?? null,
       toUserId: receiverId,
-      productId: this.product.id,
+      productId: product.id,
       text: this.messageForm.getRawValue().text
     });
     this.messageForm.reset();

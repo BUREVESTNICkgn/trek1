@@ -60,10 +60,13 @@
               <mat-label>Количество</mat-label>
               <input matInput type="number" formControlName="stock" />
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Ссылки на фото через запятую</mat-label>
-              <textarea matInput rows="2" formControlName="photos"></textarea>
-            </mat-form-field>
+            <div class="file-upload">
+              <label class="upload-label">Фото товара</label>
+              <input type="file" multiple accept="image/*" (change)="onPhotosSelected($event)" />
+              <div class="photo-previews" *ngIf="listingForm.value.photos?.length">
+                <img *ngFor="let photo of listingForm.value.photos" [src]="photo" alt="Превью" />
+              </div>
+            </div>
             <mat-form-field appearance="outline">
               <mat-label>Описание</mat-label>
               <textarea matInput rows="3" formControlName="description"></textarea>

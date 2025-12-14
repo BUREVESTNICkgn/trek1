@@ -47,22 +47,22 @@ export class AuthComponent {
     address: ['']
   });
 
-  login(): void {
+  async login(): Promise<void> {
     this.error.set(null);
     try {
       const { email, password } = this.loginForm.getRawValue();
-      this.auth.login(email, password);
+      await this.auth.login(email, password);
       this.router.navigateByUrl('/');
     } catch (e: unknown) {
       this.error.set((e as Error).message);
     }
   }
 
-  register(): void {
+  async register(): Promise<void> {
     this.error.set(null);
     try {
       const { name, email, password, address } = this.registerForm.getRawValue();
-      this.auth.register({ name, email, password, address });
+      await this.auth.register({ name, email, password, address });
       this.router.navigateByUrl('/');
     } catch (e: unknown) {
       this.error.set((e as Error).message);

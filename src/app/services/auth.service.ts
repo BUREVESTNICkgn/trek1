@@ -1,13 +1,18 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { User, UserRole } from '../models/user';
 
-const STORAGE_KEY = 'computer-store-users';
-const SESSION_KEY = 'computer-store-session';
+const SESSION_KEY = 'computer-store-session-token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly usersSignal = signal<User[]>(this.restoreUsers());
-  private readonly currentUserSignal = signal<User | null>(this.restoreSession());
+  private readonly http = inject(HttpClient);
+  private readonly api = '/api';
+
+  private readonly tokenSignal = signal<string | null>(localStorage.getItem(SESSION_KEY));
+  private readonly currentUserSignal = signal<User | null>(null);
+  private readonly usersSignal = signal<User[]>([]);
 
   readonly users = computed(() => this.usersSignal());
   readonly currentUser = computed(() => this.currentUserSignal());
@@ -18,104 +23,82 @@ export class AuthService {
     () => this.currentUserSignal()?.role === 'manager' || this.currentUserSignal()?.role === 'admin'
   );
 
-  register(user: Omit<User, 'id' | 'role'> & { role?: UserRole }): void {
-    const emailExists = this.usersSignal().some((u) => u.email.toLowerCase() === user.email.toLowerCase());
-    if (emailExists) {
-      throw new Error('Пользователь с такой почтой уже существует');
+  constructor() {
+    this.restoreSession();
+  }
+
+  private authOptions() {
+    const token = this.tokenSignal();
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  }
+
+  private async restoreSession() {
+    if (!this.tokenSignal()) return;
+    try {
+      const user = await firstValueFrom(this.http.get<User>(`${this.api}/auth/me`, this.authOptions()));
+      this.currentUserSignal.set(user);
+      if (user.role === 'admin') this.loadUsers();
+    } catch (e) {
+      this.logout();
     }
-    const id = Math.max(0, ...this.usersSignal().map((u) => u.id)) + 1;
-    const newUser: User = { id, role: user.role ?? 'user', ...user };
-    this.usersSignal.update((users) => [...users, newUser]);
-    this.persistUsers();
-    this.login(user.email, user.password);
   }
 
-  addUser(fromAdmin: User, user: Omit<User, 'id'>): void {
-    if (fromAdmin.role !== 'admin') throw new Error('Недостаточно прав');
-    const emailExists = this.usersSignal().some((u) => u.email.toLowerCase() === user.email.toLowerCase());
-    if (emailExists) {
-      throw new Error('Пользователь с такой почтой уже существует');
-    }
-    const id = Math.max(0, ...this.usersSignal().map((u) => u.id)) + 1;
-    this.usersSignal.update((users) => [...users, { ...user, id }]);
-    this.persistUsers();
-  }
-
-  updateProfile(changes: Partial<Pick<User, 'name' | 'address'>>): void {
-    const current = this.currentUserSignal();
-    if (!current) return;
-    this.usersSignal.update((users) => users.map((u) => (u.id === current.id ? { ...u, ...changes } : u)));
-    const updated = { ...current, ...changes } as User;
-    this.currentUserSignal.set(updated);
-    this.persistUsers();
-    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
-  }
-
-  updateRole(userId: number, role: UserRole): void {
-    this.usersSignal.update((users) => users.map((u) => (u.id === userId ? { ...u, role } : u)));
-    if (this.currentUserSignal()?.id === userId) {
-      const updated = { ...this.currentUserSignal()!, role } as User;
-      this.currentUserSignal.set(updated);
-      localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
-    }
-    this.persistUsers();
-  }
-
-  login(email: string, password: string): void {
-    const user = this.usersSignal().find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+  async register(user: Omit<User, 'id' | 'role'> & { role?: UserRole }): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<{ user: User; token: string }>(`${this.api}/auth/register`, user)
     );
-    if (!user) {
-      throw new Error('Неверный логин или пароль');
+    this.persistSession(res.user, res.token);
+  }
+
+  async addUser(fromAdmin: User, user: Omit<User, 'id'>): Promise<void> {
+    if (fromAdmin.role !== 'admin') throw new Error('Недостаточно прав');
+    const added = await firstValueFrom(
+      this.http.post<User>(`${this.api}/users`, user, this.authOptions())
+    );
+    this.usersSignal.update((list) => [...list, added]);
+  }
+
+  async updateProfile(changes: Partial<Pick<User, 'name' | 'address'>>): Promise<void> {
+    const updated = await firstValueFrom(
+      this.http.put<User>(`${this.api}/auth/profile`, changes, this.authOptions())
+    );
+    this.currentUserSignal.set(updated);
+    localStorage.setItem(SESSION_KEY, this.tokenSignal() ?? '');
+  }
+
+  async updateRole(userId: number, role: UserRole): Promise<void> {
+    const updated = await firstValueFrom(
+      this.http.patch<User>(`${this.api}/users/${userId}/role`, { role }, this.authOptions())
+    );
+    this.usersSignal.update((users) => users.map((u) => (u.id === userId ? updated : u)));
+    if (this.currentUserSignal()?.id === userId) {
+      this.currentUserSignal.set(updated);
+      localStorage.setItem(SESSION_KEY, this.tokenSignal() ?? '');
     }
-    this.currentUserSignal.set(user);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  }
+
+  async login(email: string, password: string): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<{ user: User; token: string }>(`${this.api}/auth/login`, { email, password })
+    );
+    this.persistSession(res.user, res.token);
   }
 
   logout(): void {
     this.currentUserSignal.set(null);
+    this.tokenSignal.set(null);
     localStorage.removeItem(SESSION_KEY);
   }
 
-  private restoreUsers(): User[] {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored) as User[];
-    const demoUsers: User[] = [
-      {
-        id: 1,
-        name: 'Администратор',
-        email: 'admin@computer.store',
-        password: 'admin',
-        role: 'admin',
-        address: 'Москва, Цветной бульвар'
-      },
-      {
-        id: 2,
-        name: 'Менеджер',
-        email: 'manager@computer.store',
-        password: 'manager',
-        role: 'manager',
-        address: 'Санкт-Петербург, Невский проспект'
-      },
-      {
-        id: 3,
-        name: 'Антон',
-        email: 'user@computer.store',
-        password: 'user',
-        role: 'user',
-        address: 'Екатеринбург, Малышева 20'
-      }
-    ];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(demoUsers));
-    return demoUsers;
+  private persistSession(user: User, token: string): void {
+    this.currentUserSignal.set(user);
+    this.tokenSignal.set(token);
+    localStorage.setItem(SESSION_KEY, token);
+    if (user.role === 'admin') this.loadUsers();
   }
 
-  private restoreSession(): User | null {
-    const stored = localStorage.getItem(SESSION_KEY);
-    return stored ? (JSON.parse(stored) as User) : null;
-  }
-
-  private persistUsers(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.usersSignal()));
+  private async loadUsers(): Promise<void> {
+    const list = await firstValueFrom(this.http.get<User[]>(`${this.api}/users`, this.authOptions()));
+    this.usersSignal.set(list);
   }
 }

@@ -55,7 +55,7 @@ export class AccountComponent {
     category: ['', Validators.required],
     price: [0, Validators.required],
     stock: [1, Validators.required],
-    photos: [''],
+    photos: [[] as string[]],
     description: ['', Validators.required],
     specs: ['', Validators.required],
     location: ['', Validators.required],
@@ -88,39 +88,51 @@ export class AccountComponent {
     return this.orders.ordersForUser(user);
   }
 
-  saveProfile(): void {
+  async onPhotosSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files) return;
+    const promises = Array.from(files).map((file) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      })
+    );
+    const photos = await Promise.all(promises);
+    this.listingForm.patchValue({ photos });
+  }
+
+  async saveProfile(): Promise<void> {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
     }
-    this.auth.updateProfile(this.profileForm.getRawValue());
+    await this.auth.updateProfile(this.profileForm.getRawValue());
   }
 
-  addListing(): void {
+  async addListing(): Promise<void> {
     if (this.listingForm.invalid || !this.currentUser) {
       this.listingForm.markAllAsTouched();
       return;
     }
     const { photos, specs, deliveryMode, deliveryPrice, ...rest } = this.listingForm.getRawValue();
-    const parsedPhotos = photos
-      .split(',')
-      .map((p) => p.trim())
-      .filter((p) => p);
     const parsedSpecs = specs
       .split(',')
       .map((s) => s.trim())
       .filter((s) => s);
 
-    this.products.addProduct({
+    await this.products.addProduct({
       ...rest,
       specs: parsedSpecs,
-      photos: parsedPhotos.length ? parsedPhotos : ['https://source.unsplash.com/random/800x600?computer'],
+      photos: photos?.length ? photos : [],
       deliveryMode,
       deliveryPrice: deliveryMode === 'pickup' ? undefined : deliveryPrice ?? 0,
       ownerId: this.currentUser.id,
       rating: 4.7
     });
-    this.listingForm.reset({ price: 0, stock: 1, deliveryMode: 'any', deliveryPrice: 0 });
+    this.listingForm.reset({ price: 0, stock: 1, deliveryMode: 'any', deliveryPrice: 0, photos: [] });
   }
 
   toggleListing(product: Product, hidden: boolean): void {

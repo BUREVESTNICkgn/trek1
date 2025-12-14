@@ -73,12 +73,12 @@ export class AdminComponent {
     this.orders.updateStatus(id, status);
   }
 
-  addUser(): void {
+  async addUser(): Promise<void> {
     if (this.userForm.invalid || !this.currentUser) {
       this.userForm.markAllAsTouched();
       return;
     }
-    this.auth.addUser(this.currentUser, this.userForm.getRawValue());
+    await this.auth.addUser(this.currentUser, this.userForm.getRawValue());
     this.userForm.reset({ role: 'manager' });
   }
 

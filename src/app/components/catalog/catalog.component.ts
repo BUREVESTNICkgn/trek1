@@ -51,6 +51,10 @@ export class CatalogComponent {
     if (queryTerm) {
       this.filters.patchValue({ term: queryTerm });
     }
+    this.productService.reload(queryTerm ?? undefined);
+    this.filters.valueChanges.subscribe(({ term, category }) =>
+      this.productService.reload(term, category || undefined)
+    );
   }
 
   get viewer(): User | null {
@@ -58,11 +62,7 @@ export class CatalogComponent {
   }
 
   get products(): Product[] {
-    const { term, category } = this.filters.getRawValue();
-    const viewer = this.viewer;
-    return term || category
-      ? this.productService.search(term, category || undefined, viewer)
-      : this.productService.visibleProducts(viewer);
+    return this.productService.visibleProducts();
   }
 
   get categories(): string[] {
