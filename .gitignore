@@ -38,6 +38,10 @@ testem.log
 /typings
 __screenshots__/
 
+# Local assets
+/uploads
+/server/computer.db
+
 # System files
 .DS_Store
 Thumbs.db

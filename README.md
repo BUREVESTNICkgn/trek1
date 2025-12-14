@@ -4,13 +4,21 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development server
 
-To start a local development server, run:
+Start the backend API first:
+
+```bash
+npm run server
+```
+
+The server listens on `http://localhost:4000` and creates a SQLite file at `server/computer.db` on first launch. Uploaded images are stored under `uploads/` and are served via `/uploads/*` paths.
+
+Then start the Angular dev server with the proxy to the API:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+With the proxy enabled, requests to `/api` and `/uploads` are forwarded to the Express server so login/registration and media loading work without CORS issues. Open `http://localhost:4200/` to develop; the application reloads automatically when source files change.
 
 ## Code scaffolding
 
