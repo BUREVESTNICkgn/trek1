@@ -1,0 +1,45 @@
+<section class="checkout">
+  <mat-card class="panel">
+    <mat-card-title>Оформление заказа</mat-card-title>
+    <p class="hint">Выберите способ получения для каждой позиции. Один заказ — несколько товаров.</p>
+
+    <div class="items" *ngIf="items.length; else empty">
+      <div class="item" *ngFor="let item of items">
+        <div>
+          <strong>{{ item.product.name }}</strong>
+          <p class="muted">{{ item.product.category }} · {{ item.quantity }} шт.</p>
+        </div>
+        <mat-form-field appearance="outline" class="mode">
+          <mat-label>Получение</mat-label>
+          <mat-select
+            [value]="defaultMode(item.product.id, item.product.deliveryMode)"
+            (selectionChange)="chooseMode(item.product.id, $event.value)"
+          >
+            <mat-option value="pickup" [disabled]="item.product.deliveryMode === 'delivery'">Самовывоз</mat-option>
+            <mat-option value="delivery" [disabled]="item.product.deliveryMode === 'pickup'">Доставка</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline"><mat-label>Имя</mat-label><input matInput formControlName="name" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Адрес доставки</mat-label><textarea matInput rows="2" formControlName="address"></textarea></mat-form-field>
+      <div class="summary">
+        <div>
+          <p class="muted">Итого</p>
+          <h3>{{ total | number }} ₽</h3>
+        </div>
+        <button mat-flat-button color="primary" type="submit">Оплатить и оформить</button>
+      </div>
+    </form>
+
+    <p class="error" *ngIf="error()">{{ error() }}</p>
+    <p class="success" *ngIf="confirmation()">{{ confirmation() }}</p>
+  </mat-card>
+</section>
+
+<ng-template #empty>
+  <p class="muted">Корзина пуста.</p>
+</ng-template>

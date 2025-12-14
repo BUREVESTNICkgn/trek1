@@ -1,0 +1,109 @@
+<section class="admin">
+  <header class="headline">
+    <div>
+      <p class="eyebrow">Рабочий стол {{ currentUser?.role }}</p>
+      <h1>Модерация объявлений и заказы</h1>
+      <p class="hint">Менеджеры видят все заказы, администратор управляет пользователями и видимостью карточек.</p>
+    </div>
+    <div class="forecast" *ngIf="forecast">
+      <p class="muted">Прогноз на месяц</p>
+      <strong>{{ forecast.expectedOrders }} заказов</strong>
+      <span>{{ forecast.projectedRevenue | number }} ₽</span>
+    </div>
+  </header>
+
+  <mat-tab-group>
+    <mat-tab label="Объявления">
+      <mat-card class="panel">
+        <mat-card-title>Карточки</mat-card-title>
+        <div class="products">
+          <article class="product" *ngFor="let product of productList()">
+            <img [src]="product.photos[0]" [alt]="product.name" />
+            <div class="meta">
+              <div class="title-line">
+                <h3>{{ product.name }}</h3>
+                <mat-chip color="primary" selected>{{ product.category }}</mat-chip>
+              </div>
+              <p class="muted">{{ product.location }}</p>
+              <p>{{ product.description }}</p>
+              <div class="badges">
+                <mat-chip>{{ product.deliveryMode !== 'delivery' ? 'Самовывоз' : 'Доставка' }}</mat-chip>
+                <mat-chip color="warn" *ngIf="product.hidden">Скрыто</mat-chip>
+              </div>
+              <button mat-stroked-button color="primary" (click)="toggleHidden(product)">
+                <mat-icon>{{ product.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+                {{ product.hidden ? 'Вернуть в показ' : 'Скрыть' }}
+              </button>
+            </div>
+          </article>
+        </div>
+      </mat-card>
+    </mat-tab>
+
+    <mat-tab label="Заказы">
+      <mat-card class="panel">
+        <mat-card-title>Все заказы</mat-card-title>
+        <div class="orders">
+          <div class="order" *ngFor="let order of orderList()">
+            <div>
+              <p class="eyebrow">#{{ order.id }} · {{ order.createdAt | date: 'd MMM, HH:mm' }}</p>
+              <h3>{{ order.total | number }} ₽</h3>
+              <p class="muted">{{ order.customerName }} — {{ order.address }}</p>
+            </div>
+            <div class="order__actions">
+              <mat-form-field appearance="outline">
+                <mat-label>Статус</mat-label>
+                <mat-select [value]="order.status" (selectionChange)="updateStatus(order.id, $event.value)">
+                  <mat-option *ngFor="let status of statusList" [value]="status">{{ status }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="items">
+                <span *ngFor="let item of order.items">{{ item.product.name }} × {{ item.quantity }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </mat-tab>
+
+    <mat-tab label="Пользователи" *ngIf="currentUser?.role === 'admin'">
+      <div class="two-columns">
+        <mat-card class="panel">
+          <mat-card-title>Добавить пользователя</mat-card-title>
+          <form [formGroup]="userForm" (ngSubmit)="addUser()" class="form-grid">
+            <mat-form-field appearance="outline"><mat-label>Имя</mat-label><input matInput formControlName="name" /></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email" /></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Пароль</mat-label><input matInput formControlName="password" /></mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Роль</mat-label>
+              <mat-select formControlName="role">
+                <mat-option value="user">user</mat-option>
+                <mat-option value="manager">manager</mat-option>
+                <mat-option value="admin">admin</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Адрес</mat-label><input matInput formControlName="address" /></mat-form-field>
+            <button mat-flat-button color="primary" type="submit">Создать</button>
+          </form>
+        </mat-card>
+
+        <mat-card class="panel">
+          <mat-card-title>Существующие</mat-card-title>
+          <div class="users">
+            <div class="user" *ngFor="let user of auth.users()">
+              <div>
+                <strong>{{ user.name }}</strong>
+                <p class="muted">{{ user.email }}</p>
+              </div>
+              <mat-select [value]="user.role" (selectionChange)="changeRole(user, $event.value)">
+                <mat-option value="user">user</mat-option>
+                <mat-option value="manager">manager</mat-option>
+                <mat-option value="admin">admin</mat-option>
+              </mat-select>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

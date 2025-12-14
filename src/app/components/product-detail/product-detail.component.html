@@ -1,0 +1,57 @@
+<ng-container *ngIf="product; else notFound">
+  <section class="product-page">
+    <div class="gallery">
+      <img *ngFor="let photo of product.photos" [src]="photo" [alt]="product.name" />
+    </div>
+
+    <mat-card class="info">
+      <div class="info__header">
+        <div>
+          <p class="eyebrow">{{ product.category }}</p>
+          <h1>{{ product.name }}</h1>
+          <p class="muted">{{ product.location }} · {{ product.createdAt | date: 'd MMM' }}</p>
+        </div>
+        <div class="price">{{ product.price | number }} ₽</div>
+      </div>
+
+      <div class="chips">
+        <mat-chip *ngIf="product.deliveryMode !== 'delivery'">Самовывоз</mat-chip>
+        <mat-chip *ngIf="product.deliveryMode !== 'pickup'">Доставка {{ product.deliveryPrice || 0 | number }} ₽</mat-chip>
+        <mat-chip color="warn" *ngIf="product.hidden">Скрыто от покупателей</mat-chip>
+      </div>
+
+      <p>{{ product.description }}</p>
+      <div class="specs">
+        <span *ngFor="let spec of product.specs">{{ spec }}</span>
+      </div>
+
+      <div class="cta">
+        <button mat-flat-button color="primary" (click)="addToCart()" [disabled]="!canAddToCart">В корзину</button>
+        <button mat-stroked-button color="accent" *ngIf="canModerate" (click)="toggleVisibility()">
+          <mat-icon>{{ product.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+          {{ product.hidden ? 'Скрыть' : 'Показать' }}
+        </button>
+        <span class="muted" *ngIf="!canAddToCart">Авторизация нужна для покупки</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="contact" *ngIf="product">
+      <mat-card-title>Написать автору</mat-card-title>
+      <p class="hint">Сообщение отправится владельцу объявления. Ответ придёт в блок сообщений менеджеру.</p>
+      <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="message-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Текст сообщения</mat-label>
+          <textarea matInput rows="3" formControlName="text"></textarea>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="messageForm.invalid">Отправить</button>
+      </form>
+    </mat-card>
+  </section>
+</ng-container>
+
+<ng-template #notFound>
+  <mat-card class="info">
+    <mat-card-title>Объявление не найдено</mat-card-title>
+    <p class="muted">Возможно, его скрыли или оно было удалено.</p>
+  </mat-card>
+</ng-template>

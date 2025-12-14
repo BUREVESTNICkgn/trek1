@@ -1,10 +1,43 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <button mat-icon-button aria-label="Home">
-    <mat-icon>checklist</mat-icon>
-  </button>
-  <span class="app-title">{{ title() }}</span>
-  <span class="spacer"></span>
-  <a mat-button href="https://angular.dev" target="_blank" rel="noopener">Angular</a>
+<mat-toolbar class="app-toolbar" color="primary">
+  <div class="toolbar-left">
+    <a mat-button routerLink="/" class="brand">
+      <mat-icon>storefront</mat-icon>
+      <span>{{ brand() }}</span>
+    </a>
+    <a mat-button routerLink="/catalog">Каталог</a>
+    <a mat-button routerLink="/account" *ngIf="isAuthenticated()">Мои объявления</a>
+    <a mat-button routerLink="/admin" *ngIf="isManager()">Управление</a>
+  </div>
+
+  <div class="toolbar-search" [formGroup]="searchForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Поиск по объявлениям</mat-label>
+      <input matInput formControlName="term" placeholder="Ноутбуки, видеокарты, ПК..." />
+      <button mat-icon-button matSuffix routerLink="/catalog" [queryParams]="{ term: searchForm.value.term }">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div class="toolbar-right">
+    <a mat-icon-button routerLink="/cart" [matBadge]="cartSize()" matBadgeColor="accent" aria-label="Корзина">
+      <mat-icon>shopping_cart</mat-icon>
+    </a>
+    <ng-container *ngIf="isAuthenticated(); else guest">
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+        {{ currentUser()?.name }}
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item routerLink="/account">Профиль</button>
+        <button mat-menu-item routerLink="/admin" *ngIf="isManager()">Рабочий стол</button>
+        <button mat-menu-item (click)="logout()">Выйти</button>
+      </mat-menu>
+    </ng-container>
+    <ng-template #guest>
+      <a mat-flat-button color="accent" routerLink="/auth">Войти</a>
+    </ng-template>
+  </div>
 </mat-toolbar>
 
 <main class="app-container">

@@ -1,0 +1,46 @@
+<section class="catalog">
+  <header class="catalog__head">
+    <div>
+      <p class="eyebrow">Маркетплейс вычислительной техники</p>
+      <h1>Публикуйте и покупайте, как на Авито</h1>
+      <p class="hint">Фильтры по категориям, видимость объявлений и понятный статус заказов.</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/account" *ngIf="viewer">Подать объявление</a>
+  </header>
+
+  <form class="filters" [formGroup]="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Поиск</mat-label>
+      <input matInput formControlName="term" placeholder="Название, описание" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Категория</mat-label>
+      <mat-select formControlName="category">
+        <mat-option value="">Все</mat-option>
+        <mat-option *ngFor="let category of categories" [value]="category">{{ category }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+
+  <div class="catalog__grid">
+    <mat-card class="product" *ngFor="let product of products" [routerLink]="['/product', product.id]">
+      <div class="product__img" [style.backgroundImage]="'url(' + product.photos[0] + ')'">
+        <mat-chip class="tag" color="primary" selected>{{ product.category }}</mat-chip>
+        <mat-chip class="tag" color="accent" *ngIf="product.hidden">Скрыто</mat-chip>
+      </div>
+      <div class="product__body">
+        <div class="product__price">{{ product.price | number }} ₽</div>
+        <h3 class="product__title">{{ product.name }}</h3>
+        <p class="product__desc">{{ product.description }}</p>
+        <div class="product__meta">
+          <mat-chip>{{ product.location }}</mat-chip>
+          <mat-chip *ngIf="product.deliveryMode !== 'pickup'">
+            Доставка {{ product.deliveryPrice || 0 | number }} ₽
+          </mat-chip>
+          <mat-chip *ngIf="product.deliveryMode !== 'delivery'">Самовывоз</mat-chip>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</section>

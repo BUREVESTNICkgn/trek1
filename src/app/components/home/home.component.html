@@ -1,0 +1,41 @@
+<section class="hero">
+  <div class="hero__content">
+    <p class="badge"><mat-icon>computer</mat-icon> Веб-сайт «Компьютер»</p>
+    <h1>Вычислительная техника для работы, игр и творчества</h1>
+    <p class="subtitle">
+      Каталог ноутбуков, игровых станций и моноблоков. Онлайн-оформление заказа, прогноз продаж и админ-панель —
+      все на одном сайте.
+    </p>
+    <div class="hero__actions">
+      <a mat-flat-button color="primary" routerLink="/catalog">Перейти в каталог</a>
+      <a mat-stroked-button color="accent" routerLink="/admin">Админ-панель</a>
+    </div>
+  </div>
+  <mat-card class="hero__card">
+    <mat-card-header>
+      <mat-card-title>Быстрый заказ</mat-card-title>
+      <mat-card-subtitle>Оформление в 3 шага</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <ol>
+        <li>Выберите модель</li>
+        <li>Добавьте в корзину</li>
+        <li>Введите контакты и подтвердите</li>
+      </ol>
+    </mat-card-content>
+  </mat-card>
+</section>
+
+<section class="features">
+  <mat-card class="feature" *ngFor="let feature of [
+      { icon: 'security', title: 'Авторизация', text: 'Регистрация и вход с проверкой роли администратора.' },
+      { icon: 'shopping_cart', title: 'Полный каталог', text: 'Поиск, фильтрация по категориям и карточки товара.' },
+      { icon: 'analytics', title: 'Прогноз', text: 'Расчет прогнозных продаж на основе последних заказов.' }
+    ]">
+    <mat-icon>{{ feature.icon }}</mat-icon>
+    <div>
+      <h3>{{ feature.title }}</h3>
+      <p>{{ feature.text }}</p>
+    </div>
+  </mat-card>
+</section>

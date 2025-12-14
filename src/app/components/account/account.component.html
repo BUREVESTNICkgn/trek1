@@ -1,0 +1,165 @@
+<section class="account" *ngIf="currentUser; else guestBlock">
+  <header class="headline">
+    <div>
+      <p class="eyebrow">Личный кабинет</p>
+      <h1>Привет, {{ currentUser?.name }}!</h1>
+      <p class="hint">Управляйте объявлениями, профилем и покупками в одном месте.</p>
+    </div>
+    <button mat-stroked-button color="primary" routerLink="/catalog">
+      <mat-icon>storefront</mat-icon>
+      В каталог
+    </button>
+  </header>
+
+  <mat-tab-group>
+    <mat-tab label="Профиль">
+      <div class="two-columns">
+        <mat-card class="panel">
+          <mat-card-title>Контакты и доставка</mat-card-title>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Имя</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Адрес доставки</mat-label>
+              <textarea matInput formControlName="address" rows="2"></textarea>
+            </mat-form-field>
+            <button mat-flat-button color="primary" type="submit">Сохранить</button>
+          </form>
+        </mat-card>
+
+        <mat-card class="panel muted">
+          <mat-card-title>Роль в системе</mat-card-title>
+          <p class="role">{{ currentUser?.role | uppercase }}</p>
+          <p class="hint">Доступ к функциям зависит от роли. Пользователи публикуют объявления, менеджеры работают с заказами, админы управляют всем.</p>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Мои объявления">
+      <div class="two-columns">
+        <mat-card class="panel">
+          <mat-card-title>Создать объявление</mat-card-title>
+          <form class="form-grid" [formGroup]="listingForm" (ngSubmit)="addListing()">
+            <mat-form-field appearance="outline">
+              <mat-label>Название</mat-label>
+              <input matInput formControlName="name" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Категория</mat-label>
+              <mat-select formControlName="category">
+                <mat-option *ngFor="let category of availableCategories()" [value]="category">{{ category }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Цена, ₽</mat-label>
+              <input matInput type="number" formControlName="price" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Количество</mat-label>
+              <input matInput type="number" formControlName="stock" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Ссылки на фото через запятую</mat-label>
+              <textarea matInput rows="2" formControlName="photos"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Описание</mat-label>
+              <textarea matInput rows="3" formControlName="description"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Характеристики через запятую</mat-label>
+              <textarea matInput rows="2" formControlName="specs"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Адрес выдачи</mat-label>
+              <input matInput formControlName="location" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Способ получения</mat-label>
+              <mat-select formControlName="deliveryMode">
+                <mat-option value="pickup">Самовывоз</mat-option>
+                <mat-option value="delivery">Доставка</mat-option>
+                <mat-option value="any">Самовывоз или доставка</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" *ngIf="listingForm.value.deliveryMode !== 'pickup'">
+              <mat-label>Цена доставки</mat-label>
+              <input matInput type="number" formControlName="deliveryPrice" />
+            </mat-form-field>
+            <button mat-flat-button color="primary" type="submit">Опубликовать</button>
+          </form>
+        </mat-card>
+
+        <mat-card class="panel">
+          <mat-card-title>Мои объявления</mat-card-title>
+          <div class="cards" *ngIf="myProducts.length; else emptyListings">
+            <article class="mini-card" *ngFor="let product of myProducts">
+              <img [src]="product.photos[0]" [alt]="product.name" />
+              <div class="meta">
+                <div class="title-line">
+                  <h3>{{ product.name }}</h3>
+                  <mat-chip color="primary" selected>{{ product.category }}</mat-chip>
+                </div>
+                <p class="description">{{ product.description }}</p>
+                <div class="badges">
+                  <mat-chip>{{ product.location }}</mat-chip>
+                  <mat-chip *ngIf="product.deliveryMode !== 'pickup'">Доставка {{ product.deliveryPrice || 0 | number }}</mat-chip>
+                  <mat-chip *ngIf="product.deliveryMode !== 'delivery'">Самовывоз</mat-chip>
+                </div>
+                <div class="controls">
+                  <span class="price">{{ product.price | number }} ₽</span>
+                  <div class="actions">
+                    <button mat-stroked-button color="primary" (click)="toggleListing(product, !product.hidden)">
+                      <mat-icon>{{ product.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+                      {{ product.hidden ? 'Скрыто' : 'Показывать' }}
+                    </button>
+                    <button mat-icon-button (click)="bumpStock(product, 1)" matTooltip="Добавить остаток">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="bumpStock(product, -1)" matTooltip="Убавить остаток">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <ng-template #emptyListings>
+            <p class="hint">Пока нет объявлений. Создайте первое — остальное возьмёт на себя маркетплейс.</p>
+          </ng-template>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Покупки и заказы">
+      <mat-card class="panel">
+        <mat-card-title>История покупок</mat-card-title>
+        <div class="orders" *ngIf="myOrders.length; else noOrders">
+          <div class="order" *ngFor="let order of myOrders">
+            <div>
+              <p class="eyebrow">#{{ order.id }} · {{ order.createdAt | date: 'd MMM, HH:mm' }}</p>
+              <h3>{{ order.total | number }} ₽ · {{ order.status }}</h3>
+              <p>{{ order.address }}</p>
+            </div>
+            <div class="items">
+              <span *ngFor="let item of order.items">{{ item.product.name }} × {{ item.quantity }}</span>
+            </div>
+          </div>
+        </div>
+        <ng-template #noOrders>
+          <p class="hint">Здесь появятся оформленные заказы и их статусы.</p>
+        </ng-template>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>
+</section>
+
+<ng-template #guestBlock>
+  <mat-card class="panel">
+    <mat-card-title>Авторизация нужна</mat-card-title>
+    <p class="hint">Войдите или зарегистрируйтесь, чтобы управлять объявлениями и заказами.</p>
+    <button mat-flat-button color="primary" routerLink="/auth">Перейти к авторизации</button>
+  </mat-card>
+</ng-template>

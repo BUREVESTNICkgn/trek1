@@ -1,0 +1,135 @@
+.account {
+  display: grid;
+  gap: 16px;
+}
+
+.headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #4e73df;
+  margin: 0;
+}
+
+.hint {
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+.role {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.two-columns {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+}
+
+.panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.panel.muted {
+  background: #f9fafb;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+}
+
+.mini-card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px;
+  align-items: center;
+}
+
+.mini-card img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.meta h3 {
+  margin: 0;
+}
+
+.description {
+  color: #4b5563;
+  margin: 4px 0;
+}
+
+.badges mat-chip {
+  margin-right: 6px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.orders {
+  display: grid;
+  gap: 12px;
+}
+
+.order {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.items {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .headline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
