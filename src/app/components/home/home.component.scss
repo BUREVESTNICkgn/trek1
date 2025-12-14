@@ -1,0 +1,64 @@
+.hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at 10% 20%, rgba(63, 81, 181, 0.12), transparent 25%),
+    radial-gradient(circle at 90% 20%, rgba(3, 155, 229, 0.16), transparent 28%);
+  border-radius: 20px;
+}
+
+.hero__content h1 {
+  margin: 12px 0 8px;
+}
+
+.hero__content .subtitle {
+  color: #5f6368;
+  margin-bottom: 16px;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero__card ol {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(63, 81, 181, 0.1);
+  color: #1a237e;
+  font-weight: 600;
+}
+
+.features {
+  margin-top: 24px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.feature {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.feature mat-icon {
+  color: #3f51b5;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,31 @@
+<ng-container *ngIf="product; else notFound">
+  <mat-card class="product-detail">
+    <img mat-card-image [src]="product.image" [alt]="product.name">
+    <mat-card-header>
+      <mat-card-title>{{ product.name }}</mat-card-title>
+      <mat-card-subtitle>{{ product.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="price">{{ product.price | currency:'RUB' }}</p>
+      <p class="description">{{ product.description }}</p>
+      <p class="meta"><mat-icon>inventory</mat-icon> {{ product.stock }} на складе</p>
+      <mat-chip-set>
+        <mat-chip *ngFor="let spec of product.specs" color="primary" selected>{{ spec }}</mat-chip>
+      </mat-chip-set>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="addToCart()">Добавить в корзину</button>
+      <a mat-button routerLink="/catalog">Назад в каталог</a>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>
+
+<ng-template #notFound>
+  <mat-card>
+    <mat-card-title>Товар не найден</mat-card-title>
+    <mat-card-content>Вернитесь в каталог и выберите модель.</mat-card-content>
+    <mat-card-actions>
+      <a mat-button color="primary" routerLink="/catalog">В каталог</a>
+    </mat-card-actions>
+  </mat-card>
+</ng-template>

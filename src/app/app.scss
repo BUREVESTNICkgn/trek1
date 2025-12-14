@@ -1,19 +1,20 @@
 .app-toolbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 2;
 }
 
-.app-title {
-  font-weight: 600;
+.brand {
+  font-weight: 700;
+  gap: 6px;
 }
 
 .spacer {
-  flex: 1 1 auto;
+  flex: 1;
 }
 
 .app-container {
-  padding: 16px;
+  padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
 }

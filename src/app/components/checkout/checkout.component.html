@@ -1,0 +1,36 @@
+<mat-card>
+  <mat-card-title>Оформление заказа</mat-card-title>
+  <mat-card-subtitle>Введите контактные данные и адрес доставки</mat-card-subtitle>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Имя и фамилия</mat-label>
+      <input matInput formControlName="name" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Адрес доставки</mat-label>
+      <textarea matInput rows="3" formControlName="address"></textarea>
+    </mat-form-field>
+
+    <div class="summary">
+      <p>Товары: {{ items.length }}</p>
+      <p class="total">Итого: {{ total | currency:'RUB' }}</p>
+    </div>
+
+    <button mat-flat-button color="primary" type="submit">Подтвердить заказ</button>
+  </form>
+
+  <div *ngIf="confirmation()" class="confirmation">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <p>{{ confirmation() }}</p>
+      <a mat-button routerLink="/catalog">Вернуться в каталог</a>
+    </div>
+  </div>
+</mat-card>

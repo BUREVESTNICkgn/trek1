@@ -1,0 +1,39 @@
+<mat-card>
+  <mat-card-title>Регистрация и вход</mat-card-title>
+  <mat-card-subtitle>Создайте учетную запись или войдите как администратор (admin@computer.store / admin)</mat-card-subtitle>
+
+  <mat-tab-group>
+    <mat-tab label="Вход">
+      <form class="form" [formGroup]="loginForm" (ngSubmit)="login()">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Пароль</mat-label>
+          <input matInput formControlName="password" type="password" required>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit">Войти</button>
+      </form>
+    </mat-tab>
+    <mat-tab label="Регистрация">
+      <form class="form" [formGroup]="registerForm" (ngSubmit)="register()">
+        <mat-form-field appearance="outline">
+          <mat-label>Имя</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Пароль</mat-label>
+          <input matInput formControlName="password" type="password" required>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit">Создать аккаунт</button>
+      </form>
+    </mat-tab>
+  </mat-tab-group>
+
+  <p class="error" *ngIf="error()">{{ error() }}</p>
+</mat-card>
