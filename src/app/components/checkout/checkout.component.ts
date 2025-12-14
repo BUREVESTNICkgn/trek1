@@ -76,7 +76,7 @@ export class CheckoutComponent {
     return 'pickup';
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     this.error.set(null);
     if (this.form.invalid || !this.items.length) {
       this.form.markAllAsTouched();
@@ -94,7 +94,7 @@ export class CheckoutComponent {
       deliveryMode: this.defaultMode(item.product.id, item.product.deliveryMode)
     }));
 
-    const order = this.orders.createOrder(buyer, itemsWithDelivery, this.form.getRawValue());
+    const order = await this.orders.createOrder(buyer, itemsWithDelivery, this.form.getRawValue());
     this.cart.clear();
     this.confirmation.set(`Заказ №${order.id} оформлен. Мы отправили подтверждение на ${order.customerEmail}.`);
   }

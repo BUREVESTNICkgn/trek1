@@ -1,8 +1,8 @@
-<section class="account" *ngIf="currentUser; else guestBlock">
+<section class="account" *ngIf="currentUser as user; else guestBlock">
   <header class="headline">
     <div>
       <p class="eyebrow">Личный кабинет</p>
-      <h1>Привет, {{ currentUser?.name }}!</h1>
+      <h1>Привет, {{ user.name }}!</h1>
       <p class="hint">Управляйте объявлениями, профилем и покупками в одном месте.</p>
     </div>
     <button mat-stroked-button color="primary" routerLink="/catalog">
@@ -31,7 +31,7 @@
 
         <mat-card class="panel muted">
           <mat-card-title>Роль в системе</mat-card-title>
-          <p class="role">{{ currentUser?.role | uppercase }}</p>
+          <p class="role">{{ user.role | uppercase }}</p>
           <p class="hint">Доступ к функциям зависит от роли. Пользователи публикуют объявления, менеджеры работают с заказами, админы управляют всем.</p>
         </mat-card>
       </div>

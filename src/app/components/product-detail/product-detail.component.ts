@@ -41,6 +41,9 @@ export class ProductDetailComponent {
   private readonly messages = inject(MessageService);
 
   readonly product = signal<Product | null>(null);
+  get productValue(): Product | null {
+    return this.product();
+  }
 
   readonly messageForm = this.fb.nonNullable.group({
     text: ['', Validators.required]

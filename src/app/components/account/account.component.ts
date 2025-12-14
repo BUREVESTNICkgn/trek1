@@ -129,8 +129,7 @@ export class AccountComponent {
       photos: photos?.length ? photos : [],
       deliveryMode,
       deliveryPrice: deliveryMode === 'pickup' ? undefined : deliveryPrice ?? 0,
-      ownerId: this.currentUser.id,
-      rating: 4.7
+      ownerId: this.currentUser.id
     });
     this.listingForm.reset({ price: 0, stock: 1, deliveryMode: 'any', deliveryPrice: 0, photos: [] });
   }

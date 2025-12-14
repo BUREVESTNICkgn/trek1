@@ -1,4 +1,4 @@
-<ng-container *ngIf="product; else notFound">
+<ng-container *ngIf="productValue as product; else notFound">
   <section class="product-page">
     <div class="gallery">
       <img *ngFor="let photo of product.photos" [src]="photo" [alt]="product.name" />
